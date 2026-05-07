@@ -96,8 +96,7 @@
     </div>
 
     <div class="controls">
-        <button class="btn" id="playBtn" onclick="startDancing()">開始</button>
-        <button class="btn" id="stopBtn" onclick="stopDancing()" disabled>暫停</button>
+        <button class="btn" id="stopBtn" onclick="stopDancing()">⏸ 暫停</button>
     </div>
 
     <div class="speed-control">
@@ -114,7 +113,7 @@
         const canvas = document.getElementById('danceCanvas');
         const ctx = canvas.getContext('2d');
         
-        let isDancing = false;
+        let isDancing = true;  // 預設開啟
         let time = 0;
         let speed = 1;
         let flipDirection = 1;
@@ -135,26 +134,22 @@
             ctx.save();
             ctx.translate(centerX, centerY);
             
-            if (isDancing) {
-                // 平滑的跳舞動畫
-                const bounce = Math.sin(time * 6 * speed) * 12;
-                const sway = Math.sin(time * 3 * speed) * 6;
-                const scaleX = 1 + Math.sin(time * 4 * speed) * 0.02;
-                
-                // 柔和的鏡像翻轉
-                const targetFlip = flipDirection;
-                ctx.scale(scaleX * targetFlip, 1);
-                ctx.translate(sway, bounce);
-                
-                // 週期性改變方向
-                if (Math.sin(time * 2 * speed) > 0.95) {
-                    flipDirection *= -1;
-                }
-                
-                // 淡淡的發光效果
-                ctx.shadowColor = 'rgba(255, 215, 0, 0.3)';
-                ctx.shadowBlur = 20 + Math.sin(time * 5 * speed) * 10;
+            // 跳舞動畫 - 持續播放
+            const bounce = Math.sin(time * 6 * speed) * 12;
+            const sway = Math.sin(time * 3 * speed) * 6;
+            const scaleX = 1 + Math.sin(time * 4 * speed) * 0.02;
+            
+            ctx.scale(scaleX * flipDirection, 1);
+            ctx.translate(sway, bounce);
+            
+            // 週期性改變方向
+            if (Math.sin(time * 2 * speed) > 0.95) {
+                flipDirection *= -1;
             }
+            
+            // 發光效果
+            ctx.shadowColor = 'rgba(255, 215, 0, 0.3)';
+            ctx.shadowBlur = 20 + Math.sin(time * 5 * speed) * 10;
             
             // 繪製圖片
             if (nailongImg.complete) {
@@ -167,14 +162,10 @@
         function startDancing() {
             isDancing = true;
             speed = parseFloat(document.getElementById('speedSlider').value);
-            document.getElementById('playBtn').disabled = true;
-            document.getElementById('stopBtn').disabled = false;
         }
         
         function stopDancing() {
             isDancing = false;
-            document.getElementById('playBtn').disabled = false;
-            document.getElementById('stopBtn').disabled = true;
         }
         
         function changeSpeed(value) {
