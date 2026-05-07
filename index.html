@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>奶龍跳舞派對 💃</title>
+    <title>奶龍跳舞 💃</title>
     <style>
         * {
             margin: 0;
@@ -13,464 +13,176 @@
 
         body {
             min-height: 100vh;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            background: linear-gradient(180deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             overflow: hidden;
         }
 
         h1 {
             color: #fff;
-            font-size: 2.5rem;
-            margin-bottom: 20px;
-            text-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
-            animation: glow 2s ease-in-out infinite alternate;
-        }
-
-        @keyframes glow {
-            from { text-shadow: 0 0 20px rgba(255, 215, 0, 0.8); }
-            to { text-shadow: 0 0 40px rgba(255, 215, 0, 1), 0 0 60px rgba(255, 215, 0, 0.6); }
+            font-size: 1.8rem;
+            font-weight: 300;
+            letter-spacing: 0.1em;
+            margin-bottom: 30px;
+            opacity: 0.9;
         }
 
         #canvas-container {
             position: relative;
-            width: 500px;
-            height: 500px;
         }
 
         #danceCanvas {
-            border-radius: 20px;
-            box-shadow: 0 0 50px rgba(255, 215, 0, 0.3);
+            display: block;
+            filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.5));
         }
 
-        /* 節奏視覺化 */
-        .rhythm-bar {
-            position: absolute;
-            bottom: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 8px;
-        }
-
-        .rhythm-dot {
-            width: 12px;
-            height: 12px;
-            background: #FFD700;
-            border-radius: 50%;
-            animation: rhythm 0.5s ease-in-out infinite;
-            box-shadow: 0 0 10px #FFD700;
-        }
-
-        .rhythm-dot:nth-child(2) { animation-delay: 0.1s; }
-        .rhythm-dot:nth-child(3) { animation-delay: 0.2s; }
-        .rhythm-dot:nth-child(4) { animation-delay: 0.3s; }
-        .rhythm-dot:nth-child(5) { animation-delay: 0.4s; }
-
-        @keyframes rhythm {
-            0%, 100% { transform: scaleY(1); }
-            50% { transform: scaleY(2); }
-        }
-
-        /* 控制按鈕 */
         .controls {
-            margin-top: 40px;
+            margin-top: 50px;
             display: flex;
-            gap: 20px;
+            gap: 15px;
         }
 
         .btn {
-            padding: 15px 30px;
-            font-size: 1.2rem;
-            border: none;
-            border-radius: 50px;
+            padding: 12px 35px;
+            font-size: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 30px;
             cursor: pointer;
             transition: all 0.3s ease;
-            font-weight: bold;
+            background: transparent;
+            color: #fff;
+            letter-spacing: 0.05em;
         }
 
-        .btn-play {
-            background: linear-gradient(135deg, #FF6B6B, #FF8E53);
-            color: white;
-            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.5);
         }
 
-        .btn-play:hover {
-            transform: scale(1.1);
-            box-shadow: 0 6px 25px rgba(255, 107, 107, 0.6);
-        }
-
-        .btn-stop {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn-stop:hover {
-            transform: scale(1.1);
-            box-shadow: 0 6px 25px rgba(102, 126, 234, 0.6);
-        }
-
-        .btn-stop:disabled {
-            opacity: 0.5;
+        .btn:disabled {
+            opacity: 0.3;
             cursor: not-allowed;
-            transform: none;
         }
 
-        /* 速度控制 */
+        .btn:disabled:hover {
+            background: transparent;
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
         .speed-control {
-            margin-top: 20px;
+            margin-top: 25px;
             display: flex;
             align-items: center;
             gap: 15px;
-            color: white;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
         }
 
         .speed-control input {
-            width: 150px;
-            accent-color: #FF6B6B;
-        }
-
-        /* 粒子效果 */
-        .particles {
-            position: fixed;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            overflow: hidden;
-            z-index: -1;
-        }
-
-        .particle {
-            position: absolute;
-            border-radius: 50%;
-            animation: float 3s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.6; }
-            50% { transform: translateY(-30px) rotate(180deg); opacity: 1; }
-        }
-
-        /* 狀態提示 */
-        .status {
-            color: #FFD700;
-            font-size: 1.2rem;
-            margin-top: 15px;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-
-        .status.show {
-            opacity: 1;
-        }
-
-        /* 彩帶 */
-        .confetti-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            overflow: hidden;
-            z-index: 10;
-        }
-
-        .confetti {
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            top: -10px;
-            animation: confettiFall linear forwards;
-        }
-
-        @keyframes confettiFall {
-            to {
-                transform: translateY(100vh) rotate(720deg);
-            }
+            width: 120px;
+            accent-color: #fff;
         }
     </style>
 </head>
 <body>
-    <div class="particles" id="particles"></div>
-    <div class="confetti-container" id="confetti"></div>
-    
-    <h1>💃 奶龍跳舞派對 🎀</h1>
+    <h1>奶龍 💃</h1>
     
     <div id="canvas-container">
-        <canvas id="danceCanvas" width="500" height="500"></canvas>
-        <div class="rhythm-bar">
-            <div class="rhythm-dot"></div>
-            <div class="rhythm-dot"></div>
-            <div class="rhythm-dot"></div>
-            <div class="rhythm-dot"></div>
-            <div class="rhythm-dot"></div>
-        </div>
+        <canvas id="danceCanvas" width="400" height="500"></canvas>
     </div>
 
     <div class="controls">
-        <button class="btn btn-play" id="playBtn" onclick="startDancing()">▶️ 開始跳舞</button>
-        <button class="btn btn-stop" id="stopBtn" onclick="stopDancing()" disabled>⏸️ 暫停</button>
+        <button class="btn" id="playBtn" onclick="startDancing()">開始</button>
+        <button class="btn" id="stopBtn" onclick="stopDancing()" disabled>暫停</button>
     </div>
 
     <div class="speed-control">
-        <span>🐢 慢</span>
-        <input type="range" id="speedSlider" min="0.3" max="2" step="0.1" value="1" onchange="changeSpeed(this.value)">
-        <span>🐇 快</span>
+        <span>慢</span>
+        <input type="range" id="speedSlider" min="0.5" max="2" step="0.1" value="1" onchange="changeSpeed(this.value)">
+        <span>快</span>
     </div>
-
-    <div class="status" id="status">🎵 奶龍正在跳舞！</div>
 
     <script>
         // 奶龍圖片
         const nailongImg = new Image();
         nailongImg.src = 'nailong.png';
         
-        // Canvas 設定
         const canvas = document.getElementById('danceCanvas');
         const ctx = canvas.getContext('2d');
         
         let isDancing = false;
-        let animationId = null;
-        let speed = 1;
         let time = 0;
-        let particles = [];
-        let mirror = false;
-        let mirrorTimer = 0;
+        let speed = 1;
+        let flipDirection = 1;
         
-        // 動畫參數
-        const danceParams = {
-            bounceY: 0,
-            rotate: 0,
-            scale: 1,
-            armWave: 0,
-            headTilt: 0,
-            bodyWave: 0
-        };
-
-        // 初始化粒子背景
-        function createParticles() {
-            const container = document.getElementById('particles');
-            const colors = ['#FFD700', '#FF6B6B', '#4ECDC4', '#95E1D3', '#AA96DA', '#fff'];
-            
-            for (let i = 0; i < 30; i++) {
-                const particle = document.createElement('div');
-                particle.className = 'particle';
-                particle.style.left = Math.random() * 100 + '%';
-                particle.style.top = Math.random() * 100 + '%';
-                particle.style.width = (5 + Math.random() * 10) + 'px';
-                particle.style.height = particle.style.width;
-                particle.style.background = colors[Math.floor(Math.random() * colors.length)];
-                particle.style.animationDelay = Math.random() * 3 + 's';
-                particle.style.animationDuration = (2 + Math.random() * 2) + 's';
-                container.appendChild(particle);
-            }
+        // 動畫
+        function animate() {
+            time += 0.016;
+            draw();
+            requestAnimationFrame(animate);
         }
-
-        // 繪製奶龍（帶跳舞效果）
-        function drawNailong() {
+        
+        function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
-            // 背景光暈效果
-            const gradient = ctx.createRadialGradient(250, 280, 50, 250, 280, 200);
-            gradient.addColorStop(0, 'rgba(255, 215, 0, 0.2)');
-            gradient.addColorStop(1, 'rgba(255, 215, 0, 0)');
-            ctx.fillStyle = gradient;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
-            // 保存當前狀態
-            ctx.save();
-            
-            // 中心點
             const centerX = canvas.width / 2;
-            const centerY = canvas.height / 2 + 50;
+            const centerY = canvas.height / 2 + 30;
             
-            // 跳舞變換
+            ctx.save();
+            ctx.translate(centerX, centerY);
+            
             if (isDancing) {
-                // 上下彈跳
-                const bounce = Math.sin(time * 8 * speed) * 15 * speed;
-                // 左右搖擺
-                const sway = Math.sin(time * 4 * speed) * 8;
-                // 旋轉
-                const rot = Math.sin(time * 2 * speed) * 0.05;
-                // 縮放脈動
-                const scalePulse = 1 + Math.sin(time * 6 * speed) * 0.03;
+                // 平滑的跳舞動畫
+                const bounce = Math.sin(time * 6 * speed) * 12;
+                const sway = Math.sin(time * 3 * speed) * 6;
+                const scaleX = 1 + Math.sin(time * 4 * speed) * 0.02;
                 
-                ctx.translate(centerX, centerY);
-                ctx.rotate(rot);
-                ctx.scale(mirror ? -1 : 1, 1);
-                ctx.scale(scalePulse, scalePulse + bounce * 0.002);
-                ctx.translate(-centerX, -centerY + bounce);
+                // 柔和的鏡像翻轉
+                const targetFlip = flipDirection;
+                ctx.scale(scaleX * targetFlip, 1);
+                ctx.translate(sway, bounce);
                 
-                // 創建彩色粒子
-                if (Math.random() < 0.3) {
-                    createSparkle(centerX + (Math.random() - 0.5) * 200, centerY + (Math.random() - 0.5) * 200);
+                // 週期性改變方向
+                if (Math.sin(time * 2 * speed) > 0.95) {
+                    flipDirection *= -1;
                 }
-            } else {
-                ctx.translate(centerX, centerY);
-                ctx.scale(mirror ? -1 : 1, 1);
-                ctx.translate(-centerX, -centerY);
+                
+                // 淡淡的發光效果
+                ctx.shadowColor = 'rgba(255, 215, 0, 0.3)';
+                ctx.shadowBlur = 20 + Math.sin(time * 5 * speed) * 10;
             }
             
             // 繪製圖片
             if (nailongImg.complete) {
-                ctx.drawImage(nailongImg, 120, 80, 260, 340);
-            } else {
-                // 備用：繪製佔位
-                ctx.fillStyle = '#FFD93D';
-                ctx.beginPath();
-                ctx.ellipse(250, 200, 100, 120, 0, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.fillStyle = '#333';
-                ctx.font = '20px sans-serif';
-                ctx.textAlign = 'center';
-                ctx.fillText('載入中...', 250, 210);
+                ctx.drawImage(nailongImg, -130, -170, 260, 340);
             }
             
             ctx.restore();
-            
-            // 繪製閃光粒子
-            drawSparkles();
-            
-            // 鏡像翻轉計時
-            if (isDancing) {
-                mirrorTimer += 0.016 * speed;
-                if (mirrorTimer > 1.5) {
-                    mirror = !mirror;
-                    mirrorTimer = 0;
-                }
-            }
-        }
-
-        // 閃光粒子系統
-        const sparkles = [];
-        
-        function createSparkle(x, y) {
-            sparkles.push({
-                x: x,
-                y: y,
-                vx: (Math.random() - 0.5) * 4,
-                vy: (Math.random() - 0.5) * 4 - 2,
-                life: 1,
-                color: ['#FFD700', '#FF6B6B', '#fff', '#4ECDC4'][Math.floor(Math.random() * 4)],
-                size: 3 + Math.random() * 5
-            });
         }
         
-        function drawSparkles() {
-            for (let i = sparkles.length - 1; i >= 0; i--) {
-                const s = sparkles[i];
-                s.x += s.vx;
-                s.y += s.vy;
-                s.life -= 0.02;
-                
-                if (s.life <= 0) {
-                    sparkles.splice(i, 1);
-                    continue;
-                }
-                
-                ctx.save();
-                ctx.globalAlpha = s.life;
-                ctx.fillStyle = s.color;
-                ctx.beginPath();
-                
-                // 繪製星星形狀
-                const spikes = 4;
-                const outerRadius = s.size;
-                const innerRadius = s.size / 2;
-                
-                for (let j = 0; j < spikes * 2; j++) {
-                    const radius = j % 2 === 0 ? outerRadius : innerRadius;
-                    const angle = (j * Math.PI) / spikes - Math.PI / 2 + time * 5;
-                    const px = s.x + Math.cos(angle) * radius;
-                    const py = s.y + Math.sin(angle) * radius;
-                    
-                    if (j === 0) ctx.moveTo(px, py);
-                    else ctx.lineTo(px, py);
-                }
-                
-                ctx.closePath();
-                ctx.fill();
-                ctx.restore();
-            }
-        }
-
-        // 動畫循環
-        function animate() {
-            time += 0.016;
-            drawNailong();
-            animationId = requestAnimationFrame(animate);
-        }
-
-        // 創建彩帶
-        function createConfetti() {
-            const container = document.getElementById('confetti');
-            container.innerHTML = '';
-            
-            const colors = ['#FF6B6B', '#4ECDC4', '#FFE66D', '#95E1D3', '#F38181', '#AA96DA', '#FFD93D', '#fff'];
-            
-            for (let i = 0; i < 50; i++) {
-                const confetti = document.createElement('div');
-                confetti.className = 'confetti';
-                confetti.style.left = Math.random() * 100 + '%';
-                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-                confetti.style.animationDuration = (2 + Math.random() * 3) + 's';
-                confetti.style.animationDelay = Math.random() * 2 + 's';
-                
-                if (Math.random() > 0.5) {
-                    confetti.style.borderRadius = '50%';
-                }
-                
-                container.appendChild(confetti);
-            }
-        }
-
-        // 開始跳舞
         function startDancing() {
             isDancing = true;
             speed = parseFloat(document.getElementById('speedSlider').value);
-            
             document.getElementById('playBtn').disabled = true;
             document.getElementById('stopBtn').disabled = false;
-            
-            const status = document.getElementById('status');
-            status.classList.add('show');
-            status.textContent = '🎵 奶龍正在跳舞！';
-            
-            createConfetti();
-            
-            // 開始時反轉一次
-            mirrorTimer = 1.4; // 讓下次立即反轉
         }
-
-        // 停止跳舞
+        
         function stopDancing() {
             isDancing = false;
-            
             document.getElementById('playBtn').disabled = false;
             document.getElementById('stopBtn').disabled = true;
-            
-            const status = document.getElementById('status');
-            status.textContent = '⏸️ 已暫停';
-            setTimeout(() => status.classList.remove('show'), 1000);
         }
-
-        // 改變速度
+        
         function changeSpeed(value) {
             speed = parseFloat(value);
         }
-
-        // 初始化
-        createParticles();
-        nailongImg.onload = () => {
-            drawNailong();
-        };
         
-        // 啟動動畫循環
+        // 初始化
+        nailongImg.onload = draw;
         animate();
     </script>
 </body>
